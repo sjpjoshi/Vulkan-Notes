@@ -1,0 +1,5 @@
+C:\Users\suraj\OneDrive\Documents\Visual Studio Projects\Notes Projects\OpeningAWindow\x64\Debug\glfw3.dll
+C:\Users\suraj\OneDrive\Documents\Visual Studio Projects\Notes Projects\OpeningAWindow\x64\Debug\vulkan-1.dll
+C:\Users\suraj\OneDrive\Documents\Visual Studio Projects\Notes Projects\OpeningAWindow\OpeningAWindow\x64\Debug\OpeningA.B85B22FF.Up2Date
+C:\Users\suraj\OneDrive\Documents\Visual Studio Projects\Vulkan Notes\OpeningAWindow\x64\Debug\glfw3.dll
+C:\Users\suraj\OneDrive\Documents\Visual Studio Projects\Vulkan Notes\OpeningAWindow\OpeningAWindow\x64\Debug\OpeningA.B85B22FF.Up2Date

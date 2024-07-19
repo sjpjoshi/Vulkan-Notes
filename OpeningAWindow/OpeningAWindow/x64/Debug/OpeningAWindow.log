@@ -1,0 +1,9 @@
+﻿  first_app.cpp
+  lve_window.cpp
+  lve_window.hpp
+  main.cpp
+  Generating Code...
+OpeningAWindow\x64\Debug\lve_window.obj : warning LNK4042: object specified more than once; extras ignored
+  OpeningAWindow.vcxproj -> C:\Users\suraj\OneDrive\Documents\Visual Studio Projects\Vulkan Notes\OpeningAWindow\x64\Debug\OpeningAWindow.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
