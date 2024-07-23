@@ -41,21 +41,25 @@ namespace lve {
 
 	void FirstApp::createPipeline() {
 		// use the lveSwapChain width and height as the device chain may not match the windows
-		auto pipelineConfig = LvePipeline::defaultPipelineConfigInfo(lveSwapChain.width(), lveSwapChain.height());
+		//auto pipelineConfig = LvePipeline::defaultPipelineConfigInfo(lveSwapChain.width(), lveSwapChain.height());
 		// Ex: A super display such as the Apple Retina Display the screen coordinate is smaller than number of pixel the window contains
 
+		PipelineConfigInfo pipelineConfig{};
+
+
+		//PipelineConfigInfo pipelineConfig{};
+		LvePipeline::defaultPipelineConfigInfo(
+			pipelineConfig,
+			lveSwapChain.width(),
+			lveSwapChain.height());
 		pipelineConfig.renderPass = lveSwapChain.getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		lvePipeline = std::make_unique<LvePipeline>(
 			lveDevice,
 			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\GraphicsPipelineOverview\\simple_shader.vert.spv",
 			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\GraphicsPipelineOverview\\simple_shader.frag.spv",
-			LvePipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)
-
-		); // lvePipeline
-
-
-	} // createPipeline
+			pipelineConfig);
+	}
 
 	void FirstApp::createCommandBuffers() {
 
