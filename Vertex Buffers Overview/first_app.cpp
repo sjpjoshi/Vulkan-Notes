@@ -27,10 +27,24 @@ namespace lve {
 	} // run
 
 	void FirstApp::loadModels() {
-		std::vector<LveModel::Vertex> vertices{ 
-			{ {0.0f, -0.5f }}, 
-			{{ 0.5f, 0.5f  }}, 
-			{{ -0.5f, 0.5f }}, 
+		/*
+		std::vector<glm::vec2> vertices;
+		int depth = 5; // Adjust depth as needed
+		generateSierpinskiVertices(vertices, glm::vec2(0.0f, -0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(-0.5f, 0.5f), depth);
+
+		// Convert glm::vec2 to LveModel::Vertex
+		std::vector<LveModel::Vertex> vulkanVertices;
+		for (const auto& v : vertices) {
+			vulkanVertices.push_back({ v });
+		}
+
+		lveModel = std::make_unique<LveModel>(lveDevice, vulkanVertices);
+		*/
+
+		std::vector<LveModel::Vertex> vertices{
+			{ {0.50f, 0.10f }},
+			{{ 0.1f, 0.1f  }},
+			{{ 0.50f, 0.1f }},
 		}; // vertices
 
 		lveModel = std::make_unique<LveModel>(lveDevice, vertices);
@@ -138,6 +152,28 @@ namespace lve {
 		} // for
 
 	} // createCommandBuffers
+
+	void FirstApp::generateSierpinskiVertices(std::vector<glm::vec2>& vertices, glm::vec2 a, glm::vec2 b, glm::vec2 c, int depth) {
+		if (depth == 0) {
+			// Add the vertices of the triangle to the vector
+			vertices.push_back(a);
+			vertices.push_back(b);
+			vertices.push_back(c);
+
+		} else {
+			// Calculate the midpoints of each side of the triangle
+			glm::vec2 ab = (a + b) / 2.0f;
+			glm::vec2 bc = (b + c) / 2.0f;
+			glm::vec2 ca = (c + a) / 2.0f;
+
+			// Recursively generate the vertices for the three smaller triangles
+			generateSierpinskiVertices(vertices, a, ab, ca, depth - 1);
+			generateSierpinskiVertices(vertices, ab, b, bc, depth - 1);
+			generateSierpinskiVertices(vertices, ca, bc, c, depth - 1);
+
+		} // else 
+
+	} // generateSierpinskiVertices
 
 	void FirstApp::drawFrame() {
 		uint32_t imageIndex;
