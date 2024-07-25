@@ -3,6 +3,7 @@
 // std
 #include <stdexcept>
 #include <array>
+#include <iostream>
 
 namespace lve {
 
@@ -27,10 +28,24 @@ namespace lve {
 	} // run
 
 	void FirstApp::loadModels() {
+		
 		/*
+		std::vector<LveModel::Vertex> vertices{
+			{ {0.50f, 0.10f }},
+			{{ 0.1f, 0.1f  }},
+			{{ 0.50f, 0.1f }},
+		}; // vertices
+
+		lveModel = std::make_unique<LveModel>(lveDevice, vertices);
+	*/
+		
 		std::vector<glm::vec2> vertices;
 		int depth = 5; // Adjust depth as needed
 		generateSierpinskiVertices(vertices, glm::vec2(0.0f, -0.5f), glm::vec2(0.5f, 0.5f), glm::vec2(-0.5f, 0.5f), depth);
+
+		for (const auto& v : vertices) {
+			std::cout << "Vertex: (" << v.x << ", " << v.y << ")\n";
+		}
 
 		// Convert glm::vec2 to LveModel::Vertex
 		std::vector<LveModel::Vertex> vulkanVertices;
@@ -39,16 +54,7 @@ namespace lve {
 		}
 
 		lveModel = std::make_unique<LveModel>(lveDevice, vulkanVertices);
-		*/
-
-		std::vector<LveModel::Vertex> vertices{
-			{ {0.50f, 0.10f }},
-			{{ 0.1f, 0.1f  }},
-			{{ 0.50f, 0.1f }},
-		}; // vertices
-
-		lveModel = std::make_unique<LveModel>(lveDevice, vertices);
-
+		
 	} // loadModels
 
 	void FirstApp::createPipelineLayout() {
@@ -86,8 +92,8 @@ namespace lve {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		lvePipeline = std::make_unique<LvePipeline>(
 			lveDevice,
-			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\GraphicsPipelineOverview\\simple_shader.vert.spv",
-			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\GraphicsPipelineOverview\\simple_shader.frag.spv",
+			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Vertex Buffers Overview\\simple_shader.vert.spv",
+			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Vertex Buffers Overview\\simple_shader.frag.spv",
 			pipelineConfig);
 	}
 
