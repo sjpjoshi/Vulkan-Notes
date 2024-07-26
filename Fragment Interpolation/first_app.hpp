@@ -31,7 +31,12 @@ namespace lve {
         void createPipeline();
         void createCommandBuffers();
         void drawFrame();
-        void generateSierpinskiVertices(std::vector<glm::vec2>& vertices, glm::vec2 a, glm::vec2 b, glm::vec2 c, int depth);
+        //void generateSierpinskiVertices(std::vector<glm::vec2>& vertices, glm::vec2 a, glm::vec2 b, glm::vec2 c, int depth);
+        void generateSierpinskiVertices(
+            std::vector<LveModel::Vertex>& vertices,
+            glm::vec2 a, glm::vec2 b, glm::vec2 c,
+            glm::vec3 colorA, glm::vec3 colorB, glm::vec3 colorC,
+            int depth);
 
         LveWindow lveWindow{ WIDTH, HEIGHT, "Hello Vulkan!" };
         LveDevice lveDevice{ lveWindow };

@@ -47,6 +47,7 @@ namespace lve {
 		lveModel = std::make_unique<LveModel>(lveDevice, vulkanVertices);
 		*/
 		
+		/*
 		std::vector<LveModel::Vertex> vertices{
 			{ {0.0f, -0.5f }, {1.0f, 0.0f, 0.0f } }, // red
 			{{ 0.5f, 0.5f  }, {0.0f, 1.0f, 0.0f } }, // blue
@@ -55,7 +56,25 @@ namespace lve {
 		}; // vertices
 
 		lveModel = std::make_unique<LveModel>(lveDevice, vertices);
-		
+		*/
+
+		std::vector<LveModel::Vertex> vertices;
+		int depth = 5; // Adjust depth as needed
+
+		// Initial colors for the vertices of the main triangle
+		glm::vec3 colorA = { 1.0f, 0.0f, 0.0f }; // red
+		glm::vec3 colorB = { 0.0f, 1.0f, 0.0f }; // green
+		glm::vec3 colorC = { 0.0f, 0.0f, 1.0f }; // blue
+
+		generateSierpinskiVertices(vertices,
+			glm::vec2(0.0f, -0.5f),
+			glm::vec2(0.5f, 0.5f),
+			glm::vec2(-0.5f, 0.5f),
+			colorA, colorB, colorC,
+			depth);
+
+		lveModel = std::make_unique<LveModel>(lveDevice, vertices);
+
 	} // loadModels
 
 	void FirstApp::createPipelineLayout() {
@@ -160,6 +179,7 @@ namespace lve {
 
 	} // createCommandBuffers
 
+	/*
 	void FirstApp::generateSierpinskiVertices(std::vector<glm::vec2>& vertices, glm::vec2 a, glm::vec2 b, glm::vec2 c, int depth) {
 		if (depth == 0) {
 			// Add the vertices of the triangle to the vector
@@ -181,6 +201,38 @@ namespace lve {
 		} // else 
 
 	} // generateSierpinskiVertices
+	*/
+
+	void FirstApp::generateSierpinskiVertices(
+		std::vector<LveModel::Vertex>& vertices,
+		glm::vec2 a, glm::vec2 b, glm::vec2 c,
+		glm::vec3 colorA, glm::vec3 colorB, glm::vec3 colorC,
+		int depth) {
+
+		if (depth == 0) {
+			// Add the vertices of the triangle to the vector
+			vertices.push_back({ a, colorA });
+			vertices.push_back({ b, colorB });
+			vertices.push_back({ c, colorC });
+		} else {
+			// Calculate the midpoints of each side of the triangle
+			glm::vec2 ab = (a + b) / 2.0f;
+			glm::vec2 bc = (b + c) / 2.0f;
+			glm::vec2 ca = (c + a) / 2.0f;
+
+			// Interpolate colors for the midpoints
+			glm::vec3 colorAB = (colorA + colorB) / 2.0f;
+			glm::vec3 colorBC = (colorB + colorC) / 2.0f;
+			glm::vec3 colorCA = (colorC + colorA) / 2.0f;
+
+			// Recursively generate the vertices for the three smaller triangles
+			generateSierpinskiVertices(vertices, a, ab, ca, colorA, colorAB, colorCA, depth - 1);
+			generateSierpinskiVertices(vertices, ab, b, bc, colorAB, colorB, colorBC, depth - 1);
+			generateSierpinskiVertices(vertices, ca, bc, c, colorCA, colorBC, colorC, depth - 1);
+
+		} // else
+
+	} // 
 
 	void FirstApp::drawFrame() {
 		uint32_t imageIndex;
