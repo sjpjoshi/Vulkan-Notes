@@ -19,7 +19,7 @@ namespace lve {
         LveRenderer(const LveRenderer&) = delete;
         LveRenderer& operator=(const LveRenderer&) = delete;
 
-        VkCommandBuffer begineFrame();
+        VkCommandBuffer beginFrame();
         void endFrame();
         void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
         void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
@@ -28,7 +28,7 @@ namespace lve {
 
         VkCommandBuffer getCurrentCommandBuffer() const { 
             assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
-            return commandBuffers[currentImageIndex]; 
+            return commandBuffers[currentFrameIndex]; 
 
         } // getCurrentCommandBuffer
 
@@ -36,6 +36,12 @@ namespace lve {
             return lveSwapChain->getRenderPass();
 
         } // getSwapChainRenderPass
+
+        int getFrameIndex() const { 
+            assert(isFrameStarted && "Cannot get a frame index when frame not in progress");
+            return currentFrameIndex;
+
+        } // getFrameIndex
 
     private:
 
@@ -50,6 +56,7 @@ namespace lve {
         std::vector<VkCommandBuffer> commandBuffers;
 
         uint32_t currentImageIndex; 
+        int currentFrameIndex;
         bool isFrameStarted = false;
 
     }; // FirstApp
