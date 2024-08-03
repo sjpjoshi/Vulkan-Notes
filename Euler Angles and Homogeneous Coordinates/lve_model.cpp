@@ -61,10 +61,8 @@ namespace lve {
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);		
 		attributeDescriptions[0].binding = 0;
 		attributeDescriptions[0].location = 0;
-		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[0].offset = offsetof(Vertex, position); 
-		// it would be a good idea because it makes it more clear that this description is for the position member variable, but it also
-		// that order we declared in our vertex struct does not matter
 
 		attributeDescriptions[1].binding = 0;
 		attributeDescriptions[1].location = 1;
@@ -74,19 +72,5 @@ namespace lve {
 		return attributeDescriptions;
 
 	} // getAttributeDescriptions
-
-	/*
-		This is another way to make the vertex binding but this is not very readable
-		std::vector<VkVertexInputAttributeDescription> LveModel::Vertex::getAttributeDescriptions() {
-			return {
-				{0, 0, VK_FORMAT_R32G32_SFLOAT,  offsetof(Vertex, position) },
-				{0, 1, VK_FORMAT_R32G32B32_SFLOAT,  offsetof(Vertex, color) }
-			
-			};
-
-		} // getAttributeDescriptions
-	
-	*/
-
 
 } // lve

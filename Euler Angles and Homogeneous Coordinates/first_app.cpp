@@ -39,56 +39,80 @@ namespace lve {
 
 	} // run
 
-	void FirstApp::loadGameObjects() {
-		
+	std::unique_ptr<LveModel> createCubeModel(LveDevice& device, glm::vec3 offset) {
 		std::vector<LveModel::Vertex> vertices{
-			{ {0.0f, -0.5f }, {1.0f, 0.0f, 0.0f } }, // red
-			{{ 0.5f, 0.5f  }, {0.0f, 1.0f, 0.0f } }, // blue
-			{{ -0.5f, 0.5f }, {0.0f, 0.0f, 1.0f } }, // green
 
-		}; // vertices
+			// left face (white)
+			{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+			{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+			{{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+			{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+			{{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+			{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
 
-		auto lveModel = std::make_shared<LveModel>(lveDevice, vertices);
-		auto triangle = LveGameObject::createGameObject();
-		triangle.model = lveModel;
-		triangle.color = { .1f, .8f, .1f };
-		triangle.transform2d.translation.x = .2f;
-		triangle.transform2d.scale = { 2.f, .5f };
-		triangle.transform2d.rotation = .25f * glm::two_pi<float>();
-		gameObjects.push_back(std::move(triangle));
+			// right face (yellow)
+			{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+			{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+			{{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+			{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+			{{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+			{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+			// top face (orange, remember y axis points down)
+			{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+			{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+			{{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+			{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+			{{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+			{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+			// bottom face (red)
+			{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+			{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+			{{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+			{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+			{{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+			{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+			// nose face (blue)
+			{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+			{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+			{{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+			{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+			{{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+			{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+			// tail face (green)
+			{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+			{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+			{{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+			{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+			{{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+			{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+		};
+		for (auto& v : vertices) {
+			v.position += offset;
+		}
+		return std::make_unique<LveModel>(device, vertices);
+	}
+
+	void FirstApp::loadGameObjects() {
+		std::shared_ptr<LveModel> lveModel = createCubeModel(lveDevice, { .0f, .0f, .0f });
+		
+		// we need to make sure our objects are within a Viewing Volume,
+		// Viewing Volume: only what is inside the viewing volume is displayed
+
+		auto cube = LveGameObject::createGameObject();
+		cube.model = lveModel;
+		cube.transform.translation = { .0f, .0f, .5f };
+		cube.transform.scale = { .5f, .5f, .5f };
+
+		gameObjects.push_back(std::move(cube));
+
 
 	} // loadModels
 
-	void FirstApp::generateSierpinskiVertices(
-		std::vector<LveModel::Vertex>& vertices,
-		glm::vec2 a, glm::vec2 b, glm::vec2 c,
-		glm::vec3 colorA, glm::vec3 colorB, glm::vec3 colorC,
-		int depth) {
-
-		if (depth == 0) {
-			// Add the vertices of the triangle to the vector
-			vertices.push_back({ a, colorA });
-			vertices.push_back({ b, colorB });
-			vertices.push_back({ c, colorC });
-		} else {
-			// Calculate the midpoints of each side of the triangle
-			glm::vec2 ab = (a + b) / 2.0f;
-			glm::vec2 bc = (b + c) / 2.0f;
-			glm::vec2 ca = (c + a) / 2.0f;
-
-			// Interpolate colors for the midpoints
-			glm::vec3 colorAB = (colorA + colorB) / 2.0f;
-			glm::vec3 colorBC = (colorB + colorC) / 2.0f;
-			glm::vec3 colorCA = (colorC + colorA) / 2.0f;
-
-			// Recursively generate the vertices for the three smaller triangles
-			generateSierpinskiVertices(vertices, a, ab, ca, colorA, colorAB, colorCA, depth - 1);
-			generateSierpinskiVertices(vertices, ab, b, bc, colorAB, colorB, colorBC, depth - 1);
-			generateSierpinskiVertices(vertices, ca, bc, c, colorCA, colorBC, colorC, depth - 1);
-
-		} // else
-
-	} // generateSierpinskiVertices
 
 	FirstApp::~FirstApp() {
 

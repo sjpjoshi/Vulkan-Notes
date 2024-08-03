@@ -5,6 +5,7 @@
 #include <array>
 #include <cassert>
 #include <iostream>
+#include <chrono>
 
 // libs
 #define GLM_FORCE_RADIANS // forces in radians and not degrees
@@ -16,8 +17,7 @@ namespace lve {
 
 	struct SimplePushConstantData {
 		// this is temporary and will be restructured
-		glm::mat2 transform{ 1.f };
-		glm::vec2 offset;
+		glm::mat4 transform{ 1.f };
 		alignas(16) glm::vec3 color;
 
 	}; // SimplePushConstantData
@@ -71,16 +71,27 @@ namespace lve {
 
 	}// createPipeline
 
+	auto lastFrameTime = std::chrono::high_resolution_clock::now();
+
 	void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects) {
 		lvePipeline->bind(commandBuffer);
+		// Calculate the time delta
+		auto currentFrameTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> deltaTime = currentFrameTime - lastFrameTime;
+		lastFrameTime = currentFrameTime;
+		float deltaSeconds = deltaTime.count();
+
+		// Adjust this factor to change the rotation speed
+		float rotationSpeed = 10.0f;
+
 		for (auto& obj : gameObjects) {
 
-			obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
+			obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + rotationSpeed  * deltaSeconds, glm::two_pi<float>());
+			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + rotationSpeed * deltaSeconds, glm::two_pi<float>());
 
 			SimplePushConstantData push{};
-			push.offset = obj.transform2d.translation;
 			push.color = obj.color;
-			push.transform = obj.transform2d.mat2();
+			push.transform = obj.transform.mat4();
 
 			vkCmdPushConstants(
 				commandBuffer,
