@@ -3,38 +3,27 @@
 #include "lve_model.hpp";
 #include <memory>
 
+// libs
+#include <glm/gtc/matrix_transform.hpp>
+
+
+
 namespace lve {
 
-	struct Transform2dComponent {
-		glm::vec2 translation;
-		glm::vec2 scale{ 1.f, 1.f };
-		float rotation;
+	struct TransformComponent {
+		glm::vec3 translation;
+		glm::vec3 scale{ 1.f, 1.f, 1.f };
+		glm::vec3 rotation;
 
-		glm::mat2 mat2() { 
 
-			// s: sin
-			// c: cos
-			const float s = glm::sin(rotation);
-			const float c = glm::cos(rotation);
-			glm::mat2 rotMatrix{
+		glm::mat4 mat4() {
+			auto transform = glm::translate(glm::mat4{ 1.f }, translation); // this creates our 4x4 translation matrix
+			transform = glm::scale(transform, scale);
+			return transform;
 
-				{c, s},
-				{-s, c}
+		} // mat4
 
-			}; // rotMatrix
-
-			glm::mat2 scaleMat{
-
-				{scale.x, .0f},
-				{.0f, scale.y}
-
-			}; // scaleMat
-
-			return scaleMat * rotMatrix;
-
-		} // mat2()
-
-	}; // Transform2dComponent
+	}; // TransformComponent
 
 	class LveGameObject {
 	public:
