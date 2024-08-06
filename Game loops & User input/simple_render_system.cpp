@@ -71,26 +71,11 @@ namespace lve {
 
 	}// createPipeline
 
-	auto lastFrameTime = std::chrono::high_resolution_clock::now();
-
 	void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects, const LveCamera& camera) {
 		lvePipeline->bind(commandBuffer);
-		// Calculate the time delta
-		auto currentFrameTime = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> deltaTime = currentFrameTime - lastFrameTime;
-		lastFrameTime = currentFrameTime;
-		float deltaSeconds = deltaTime.count();
-
-		// Adjust this factor to change the rotation speed
-		float rotationSpeed = 9.0f;
-
 		auto projectionView = camera.getProjection() * camera.getView(); // every rendered object will used the same projection and view matrix, so this way we can avoid doing the calculation for each iterated view function
 
 		for (auto& obj : gameObjects) {
-
-			obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + rotationSpeed  * deltaSeconds, glm::two_pi<float>());
-			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + rotationSpeed * deltaSeconds, glm::two_pi<float>());
-
 			SimplePushConstantData push{};
 			push.color = obj.color;
 			// this is temp solution
