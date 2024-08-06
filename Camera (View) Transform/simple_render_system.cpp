@@ -84,6 +84,8 @@ namespace lve {
 		// Adjust this factor to change the rotation speed
 		float rotationSpeed = 9.0f;
 
+		auto projectionView = camera.getProjection() * camera.getView(); // every rendered object will used the same projection and view matrix, so this way we can avoid doing the calculation for each iterated view function
+
 		for (auto& obj : gameObjects) {
 
 			obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + rotationSpeed  * deltaSeconds, glm::two_pi<float>());
@@ -92,7 +94,7 @@ namespace lve {
 			SimplePushConstantData push{};
 			push.color = obj.color;
 			// this is temp solution
-			push.transform = camera.getProjection() * obj.transform.mat4();
+			push.transform = projectionView * obj.transform.mat4();
 
 			vkCmdPushConstants(
 				commandBuffer,

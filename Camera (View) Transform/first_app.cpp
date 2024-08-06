@@ -25,6 +25,8 @@ namespace lve {
 
 		SimpleRenderSystem simpleRenderSystem(lveDevice, lveRenderer.getSwapChainRenderPass());
 		LveCamera camera{};
+		//camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, .0f, 1.f));
+		camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
 		while (!lveWindow.shouldClose()) { // the condition checks if they have noc closed it
 			glfwPollEvents(); // a window processing events call
