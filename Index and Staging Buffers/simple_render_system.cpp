@@ -65,8 +65,8 @@ namespace lve {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		lvePipeline = std::make_unique<LvePipeline>(
 			lveDevice,
-			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Game loops & User input\\simple_shader.vert.spv",
-			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Game loops & User input\\simple_shader.frag.spv",
+			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Index and Staging Buffers\\simple_shader.vert.spv",
+			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Index and Staging Buffers\\simple_shader.frag.spv",
 			pipelineConfig);
 
 	}// createPipeline

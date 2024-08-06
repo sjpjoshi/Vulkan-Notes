@@ -28,7 +28,15 @@ namespace lve {
 
 		}; // Vertex
 
-		LveModel(LveDevice& lveDevice, const std::vector<Vertex>& vertices);
+		// while we could call this Builder, it would sound too much like the Builder Design Pattern and this is not the same thing
+		// this is a temporary builder object storing our vertex and index information until it can be copied over to the model's index and buffer index memory
+		struct Data {
+			std::vector<Vertex> vertices{};
+			std::vector<uint32_t> indices {};
+
+		}; // Data
+
+		LveModel(LveDevice& lveDevice, const LveModel::Data &builder);
 		~LveModel();
 
 		LveModel(const LveModel&) = delete;
@@ -39,16 +47,21 @@ namespace lve {
 
 
 	private:
-		// Variables
 		LveDevice& lveDevice;
 
 		// two separate objects, we are in charge of memory management here
 		VkBuffer vertexBuffer;
 		VkDeviceMemory vertexBufferMemory;
-
 		uint32_t vertexCount;
 
 		void createVertexBuffers(const std::vector<Vertex>& vertices);
+		void createIndexBuffers(const std::vector<uint32_t>& indices);
+
+		bool hasIndexBuffer = false;
+		VkBuffer indexBuffer; 
+		VkDeviceMemory indexBufferMemory;
+		uint32_t indexCount;
+
 
 	}; // LveModel
 
