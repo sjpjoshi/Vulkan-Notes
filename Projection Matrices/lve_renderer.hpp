@@ -37,6 +37,8 @@ namespace lve {
 
         } // getSwapChainRenderPass
 
+        float getAspectRatio() const { return lveSwapChain->extentAspectRatio(); } // getAspectRatio
+
         int getFrameIndex() const { 
             assert(isFrameStarted && "Cannot get a frame index when frame not in progress");
             return currentFrameIndex;

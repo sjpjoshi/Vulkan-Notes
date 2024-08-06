@@ -65,15 +65,15 @@ namespace lve {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		lvePipeline = std::make_unique<LvePipeline>(
 			lveDevice,
-			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Euler Angles and Homogeneous Coordinates\\simple_shader.vert.spv",
-			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Euler Angles and Homogeneous Coordinates\\simple_shader.frag.spv",
+			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Projection Matrices\\simple_shader.vert.spv",
+			"C:\\Users\\suraj\\OneDrive\\Documents\\Visual Studio Projects\\Vulkan Notes\\Projection Matrices\\simple_shader.frag.spv",
 			pipelineConfig);
 
 	}// createPipeline
 
 	auto lastFrameTime = std::chrono::high_resolution_clock::now();
 
-	void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects) {
+	void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects, const LveCamera& camera) {
 		lvePipeline->bind(commandBuffer);
 		// Calculate the time delta
 		auto currentFrameTime = std::chrono::high_resolution_clock::now();
@@ -88,12 +88,11 @@ namespace lve {
 
 			obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + rotationSpeed  * deltaSeconds, glm::two_pi<float>());
 			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + rotationSpeed * deltaSeconds, glm::two_pi<float>());
-			obj.transform.rotation.z = glm::mod(obj.transform.rotation.x + rotationSpeed * deltaSeconds, glm::two_pi<float>());
-
 
 			SimplePushConstantData push{};
 			push.color = obj.color;
-			push.transform = obj.transform.mat4();
+			// this is temp solution
+			push.transform = camera.getProjection() * obj.transform.mat4();
 
 			vkCmdPushConstants(
 				commandBuffer,
