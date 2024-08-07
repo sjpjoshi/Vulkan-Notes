@@ -1,4 +1,5 @@
 #include "lve_model.hpp"
+#include "lve_device.hpp"
 
 // std
 #include <cassert>
@@ -6,7 +7,7 @@
 
 namespace lve { 
 
-	LveModel::LveModel(LveDevice& device, const LveModel::Data &builder) : lveDevice{device} {
+	LveModel::LveModel(LveDevice& device, const LveModel::Builder &builder) : lveDevice{device} {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 
@@ -49,16 +50,41 @@ namespace lve {
 	} // draw
 
 	void LveModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
+		// note: HOST = CPU and DEVICE = GPU
 		vertexCount = static_cast<uint32_t>(vertices.size());
 		assert(vertexCount >= 3 && "Vertex count must be at least 3");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount; // formula for giving us the total number of bytes 
-		// note: HOST = CPU and DEVICE = GPU
-		lveDevice.createBuffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBuffer, vertexBufferMemory);
+
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
+		lveDevice.createBuffer(
+			bufferSize,
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			stagingBuffer,
+			stagingBufferMemory
+
+		); // createBuffer
 
 		void* data;
-		vkMapMemory(lveDevice.device(), vertexBufferMemory, 0, bufferSize, 0, &data); // this creates a region of host memory and maps it to a region of device memory 
+		vkMapMemory(lveDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data); // this creates a region of host memory and maps it to a region of device memory 
 		memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(lveDevice.device(), vertexBufferMemory);
+		vkUnmapMemory(lveDevice.device(), stagingBufferMemory);
+
+		lveDevice.createBuffer(
+			bufferSize,
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+			vertexBuffer,
+			vertexBufferMemory
+
+		); // createBuffer
+
+		// we need to perform a copy operation to move the contents of the staging buffer to the vertex buffer
+		lveDevice.copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+		vkDestroyBuffer(lveDevice.device(), stagingBuffer, nullptr);
+		vkFreeMemory(lveDevice.device(), stagingBufferMemory, nullptr);
 
 	} // createVertexBuffers
 
@@ -69,13 +95,37 @@ namespace lve {
 			return;
 
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount; // formula for giving us the total number of bytes 
-		// note: HOST = CPU and DEVICE = GPU
-		lveDevice.createBuffer(bufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indexBuffer, indexBufferMemory);
+
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
+		lveDevice.createBuffer(
+			bufferSize, 
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+			stagingBuffer, 
+			stagingBufferMemory
+			 
+		); // createBuffer
 
 		void* data;
-		vkMapMemory(lveDevice.device(), indexBufferMemory, 0, bufferSize, 0, &data); // this creates a region of host memory and maps it to a region of device memory 
+		vkMapMemory(lveDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data); // this creates a region of host memory and maps it to a region of device memory 
 		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(lveDevice.device(), indexBufferMemory);
+		vkUnmapMemory(lveDevice.device(), stagingBufferMemory);
+
+		lveDevice.createBuffer(
+			bufferSize, 
+			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			indexBuffer,
+			indexBufferMemory 
+
+		); // createBuffer
+
+		// we need to perform a copy operation to move the contents of the staging buffer to the vertex buffer
+		lveDevice.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+		vkDestroyBuffer(lveDevice.device(), stagingBuffer, nullptr);
+		vkFreeMemory(lveDevice.device(), stagingBufferMemory, nullptr);
 
 	} // createIndexBuffers
 
