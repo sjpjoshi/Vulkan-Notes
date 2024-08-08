@@ -9,7 +9,7 @@
 
 // stds
 #include <vector>
-
+#include <memory>
 
 namespace lve {
 	class LveModel {
@@ -17,14 +17,21 @@ namespace lve {
 	public:
 		
 		struct Vertex {
-			glm::vec3 position;
-			glm::vec3 color;
+			glm::vec3 position{};
+			glm::vec3 color{};
+			glm::vec3 normal{};
+			glm::vec2 uv{};
 
-			// we can either make 2 separate bindings or interleave
+			// we can either make s2 separate bindings or interleave
 			// its simplier to interleave 
 
 			static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
 			static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
+
+			bool operator==(const Vertex& other) const {
+				return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
+
+			} // operator==
 
 		}; // Vertex
 
@@ -33,6 +40,8 @@ namespace lve {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices {};
 
+			void loadModel(const std::string& filepath);
+
 		}; // Data
 
 		LveModel(LveDevice& lveDevice, const LveModel::Builder &builder);
@@ -40,6 +49,8 @@ namespace lve {
 
 		LveModel(const LveModel&) = delete;
 		LveModel& operator=(const LveModel&) = delete;
+
+		static std::unique_ptr<LveModel> createModelFromFile(LveDevice& device, const std::string& filepath);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
